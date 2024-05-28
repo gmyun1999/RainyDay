@@ -3,16 +3,8 @@ CC = gcc
 CFLAGS = -I./include -I./include/services -Wall -Wextra -pthread
 
 # 소스 파일과 오브젝트 파일 설정
-SRCS = main.c \
-       src/gpio.c \
-       src/button.c \
-       src/plant.c \
-       src/step.c \
-       src/config.c \
-       src/services/button_service.c \
-       src/services/plant_service.c
-
-OBJS = $(SRCS:.c=.o)
+SRCS = $(wildcard main.c src/*.c src/services/*.c)
+OBJS = $(patsubst %.c,%.o,$(SRCS))
 
 # 실행 파일 이름
 TARGET = RainyDay
