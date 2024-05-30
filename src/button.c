@@ -1,7 +1,7 @@
 #include "button.h"
 #include "gpio.h"
-#include "step.h"  // STEP 열거형과 관련된 헤더 파일 포함
-#include "button_service.h"  // button_service 관련 함수 포함
+#include "step.h"
+#include "button_service.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
@@ -11,36 +11,6 @@
 extern int plant_index;
 extern int plant_quantity;
 extern STEP current_step;
-
-void* onLongClick(BUTTON* btn) {
-    // 이 예제에서는 긴 클릭에 대한 작업 없음
-    (void)btn; // 사용되지 않는 매개변수 경고 방지
-    return NULL;
-}
-
-void* onPressDown1(BUTTON* btn) {
-    if (current_step == STEP1) {
-        return step1onPressDown1(btn);
-    } else if (current_step == STEP2) {
-        return step2onPressDown1(btn);
-    }
-    return NULL;
-}
-
-void* onPressDown2(BUTTON* btn) {
-    if (current_step == STEP1) {
-        return step1onPressDown2(btn);
-    } else if (current_step == STEP2) {
-        return step2onPressDown2(btn);
-    }
-    return NULL;
-}
-
-void* onPressUp(BUTTON* btn) {
-    // 이 예제에서는 누름 해제에 대한 작업 없음
-    (void)btn; // 사용되지 않는 매개변수 경고 방지
-    return NULL;
-}
 
 static void clean_up(void* arg) {
     BUTTON* btn = (BUTTON*)arg;
@@ -52,6 +22,7 @@ static void* button_polling(void* arg) {
     BUTTON* btn = (BUTTON*)arg;
     int interval = 1000000 / btn->polling_rate;
     int last_state = HIGH;
+    int press_time = 0;
 
     pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
     pthread_cleanup_push(clean_up, btn);
@@ -79,8 +50,16 @@ static void* button_polling(void* arg) {
 
         if (current_state == LOW && last_state == HIGH) {
             btn->onPressDown(btn);
+            press_time = 0;
         } else if (current_state == HIGH && last_state == LOW) {
             btn->onPressUp(btn);
+            if (press_time >= 800000) {
+                btn->onLongClick(btn);
+            }
+        }
+
+        if (current_state == LOW) {
+            press_time += interval;
         }
 
         last_state = current_state;

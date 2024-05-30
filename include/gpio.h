@@ -9,5 +9,7 @@
 int GPIOExport(int pin);
 int GPIOUnexport(int pin);
 int GPIODirection(int pin, int dir);
+int GPIOWrite(int pin, int value);
+int GPIORead(int pin);
 
 #endif // GPIO_H

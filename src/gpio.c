@@ -66,3 +66,44 @@ int GPIODirection(int pin, int dir) {
     close(fd);
     return 0;
 }
+
+int GPIOWrite(int pin, int value) {
+    char path[35];
+    int fd;
+    snprintf(path, 35, "/sys/class/gpio/gpio%d/value", pin);
+    fd = open(path, O_WRONLY);
+    if (fd == -1) {
+        fprintf(stderr, "Failed to open gpio value for writing\n");
+        return -1;
+    }
+
+    if (write(fd, value == LOW ? "0" : "1", 1) != 1) {
+        fprintf(stderr, "Failed to write value!\n");
+        close(fd);
+        return -1;
+    }
+
+    close(fd);
+    return 0;
+}
+
+int GPIORead(int pin) {
+    char path[35];
+    char value_str[3];
+    int fd;
+    snprintf(path, 35, "/sys/class/gpio/gpio%d/value", pin);
+    fd = open(path, O_RDONLY);
+    if (fd == -1) {
+        fprintf(stderr, "Failed to open gpio value for reading\n");
+        return -1;
+    }
+
+    if (read(fd, value_str, 3) == -1) {
+        fprintf(stderr, "Failed to read value!\n");
+        close(fd);
+        return -1;
+    }
+
+    close(fd);
+    return atoi(value_str);
+}

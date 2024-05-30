@@ -1,6 +1,7 @@
 # 컴파일러와 플래그 설정
 CC = gcc
 CFLAGS = -I./include -I./include/services -Wall -Wextra -pthread
+LDFLAGS = -pthread -li2c
 
 # 소스 파일과 오브젝트 파일 설정
 SRCS = $(wildcard main.c src/*.c src/services/*.c)
@@ -14,7 +15,7 @@ all: $(TARGET)
 
 # 실행 파일 생성 규칙
 $(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS)
+	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS) $(LDFLAGS)
 
 # 개별 소스 파일에 대한 오브젝트 파일 생성 규칙
 %.o: %.c
