@@ -3,10 +3,9 @@
 
 typedef struct plant {
     char* name;
-    float temperature;
-    float humidity;
-    float water_amount;
-    float light_intensity;
+    float min_humidity;
+    float min_water_level;
+    float min_light_intensity;
 } PLANT;
 
 extern PLANT plants[];

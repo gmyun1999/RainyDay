@@ -1,10 +1,10 @@
 # 컴파일러와 플래그 설정
 CC = gcc
 CFLAGS = -I./include -I./include/services -Wall -Wextra -pthread
-LDFLAGS = -pthread -li2c
+LDFLAGS = -pthread -li2c -lcjson
 
 # 소스 파일과 오브젝트 파일 설정
-SRCS = $(wildcard main.c src/*.c src/services/*.c)
+SRCS = main.c $(wildcard src/*.c src/services/*.c)
 OBJS = $(patsubst %.c,%.o,$(SRCS))
 
 # 실행 파일 이름

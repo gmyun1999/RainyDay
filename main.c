@@ -1,14 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
-#include <string.h>
+#include <unistd.h>
+#include "gpio.h"
 #include "button.h"
 #include "config.h"
 #include "services/button_service.h"
 #include "services/plant_service.h"
 #include "services/lcd1602_service.h"
+#include "services/communication_service.h"
 #include "step.h"
-#include <unistd.h>
 
 // 설정 파일 경로
 #define CONFIG_FILE "config.txt"
@@ -16,18 +17,17 @@
 pthread_t *pt1;
 pthread_t *pt2;
 pthread_t lcd_thread;
+pthread_t comm_thread;
 
 // BUTTON 구조체 초기화
 BUTTON *button1;
 BUTTON *button2;
 
-int main(void)
-{
+int main(void) {
     int pins[4];
     int polling_rates[2];
 
-    if (read_config(CONFIG_FILE, pins, polling_rates) != 0)
-    {
+    if (read_config(CONFIG_FILE, pins, polling_rates) != 0) {
         return 1;
     }
 
@@ -42,6 +42,30 @@ int main(void)
     button1->onPressDown = onPressDown1;
     button1->onPressUp = onPressUp;
 
+    // 첫 번째 버튼의 pull-up 설정
+    if (GPIOExport(button1->pin) == -1) {
+        printf("Failed to export GPIO pin for button 1\n");
+        return 1;
+    }
+    if (GPIOExport(button1->pout) == -1) {
+        printf("Failed to export GPIO pout for button 1\n");
+        return 1;
+    }
+
+    if (GPIODirection(button1->pin, IN) == -1) {
+        printf("Failed to set direction for GPIO pin for button 1\n");
+        return 1;
+    }
+    if (GPIODirection(button1->pout, OUT) == -1) {
+        printf("Failed to set direction for GPIO pout for button 1\n");
+        return 1;
+    }
+
+    if (GPIOWrite(button1->pout, HIGH) != 0) {
+        printf("Failed to set pull-up for button 1\n");
+        return 1;
+    }
+
     pt1 = initButton(button1);
 
     // 두 번째 버튼 초기화
@@ -53,6 +77,30 @@ int main(void)
     button2->onPressDown = onPressDown2;
     button2->onPressUp = onPressUp;
 
+    // 두 번째 버튼의 pull-up 설정
+    if (GPIOExport(button2->pin) == -1) {
+        printf("Failed to export GPIO pin for button 2\n");
+        return 1;
+    }
+    if (GPIOExport(button2->pout) == -1) {
+        printf("Failed to export GPIO pout for button 2\n");
+        return 1;
+    }
+
+    if (GPIODirection(button2->pin, IN) == -1) {
+        printf("Failed to set direction for GPIO pin for button 2\n");
+        return 1;
+    }
+    if (GPIODirection(button2->pout, OUT) == -1) {
+        printf("Failed to set direction for GPIO pout for button 2\n");
+        return 1;
+    }
+
+    if (GPIOWrite(button2->pout, HIGH) != 0) {
+        printf("Failed to set pull-up for button 2\n");
+        return 1;
+    }
+
     pt2 = initButton(button2);
 
     // LCD 출력 스레드 생성
@@ -61,13 +109,10 @@ int main(void)
         return 1;
     }
 
-    if (pt1 == NULL || pt2 == NULL)
-    {
+    if (pt1 == NULL || pt2 == NULL) {
         printf("button init fail\n");
         return 1;
-    }
-    else
-    {
+    } else {
         printf("Hello Buttons!\n");
 
         while (1) {

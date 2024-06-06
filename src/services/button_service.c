@@ -2,12 +2,15 @@
 #include "step.h"
 #include "plant.h"
 #include "services/lcd1602_service.h"
+#include "services/communication_service.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 extern int plant_index;
 extern int plant_quantity;
 extern STEP current_step;
+extern pthread_t comm_thread; // 통신 스레드
 
 void* step1onPressDown1(BUTTON* btn) {
     (void)btn; // 사용되지 않는 매개변수 경고 방지
@@ -48,10 +51,9 @@ void* step2onPressDown2(BUTTON* btn) {
 
         // 식물 정보 출력
         printf("Plant: %s\n", plants[plant_index].name);
-        printf("Temperature: %.1f\n", plants[plant_index].temperature);
-        printf("Humidity: %.1f\n", plants[plant_index].humidity);
-        printf("Water Amount: %.1f\n", plants[plant_index].water_amount);
-        printf("Light Intensity: %.1f\n", plants[plant_index].light_intensity);
+        printf("min_temperature_humidity: %.1f\n", plants[plant_index].min_humidity);
+        printf("min_water_level: %.1f\n", plants[plant_index].min_water_level);
+        printf("min_light_intensity: %.1f\n", plants[plant_index].min_light_intensity);
 
         char bottom_message[32];
         
@@ -60,6 +62,11 @@ void* step2onPressDown2(BUTTON* btn) {
 
         sleep(2); // 타이밍 문제
         update_lcd_message("STEP3", "do something");
+
+        // 통신 스레드 시작
+        if (pthread_create(&comm_thread, NULL, communication_thread, NULL) != 0) {
+            printf("Failed to create communication thread\n");
+        }
         
         // 이후 다른 로직 필요할수도 ㅇㅇ?
         
