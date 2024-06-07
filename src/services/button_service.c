@@ -61,7 +61,7 @@ void* step2onPressDown2(BUTTON* btn) {
         update_lcd_message("STEP2", bottom_message);
 
         sleep(2); // 타이밍 문제
-        update_lcd_message("STEP3", "do something");
+        update_lcd_message("hello user", "everything ready");
 
         // 통신 스레드 시작
         if (pthread_create(&comm_thread, NULL, communication_thread, NULL) != 0) {

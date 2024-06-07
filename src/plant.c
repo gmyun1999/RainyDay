@@ -1,9 +1,9 @@
 #include "plant.h"
 
 PLANT plants[] = {
-    {"Rose", 20.0, 30.0, 200.0},
-    {"Tulip", 15.0, 30.0, 150.0},
-    {"Sunflower", 25.0, 30.0, 250.0}
+    {"tomato", 60.0, 150.0, 200.0},
+    {"Lettuce", 80.0, 150.0, 150.0},
+    {"apple_mint", 40.0, 150.0, 250.0}
 };
 
 int plant_count = sizeof(plants) / sizeof(plants[0]);
