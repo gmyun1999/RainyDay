@@ -8,8 +8,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include "cjson/cJSON.h"
-#include "../../header/speaker.h"
-#include "../../header/temperature_and_humidity.h"
+#include "../header/speaker.h"
+#include "../header/temperature_and_humidity.h"
 
 // function for handling error
 void error_handling(char *message) {
@@ -228,7 +228,7 @@ int main(int argc, char *argv[]){
             else if (type->valueint == 0)
                 printf("instruction : %s\n", json);
             
-            else {
+            else
                 printf("received json object has no value\n");
         }
 
