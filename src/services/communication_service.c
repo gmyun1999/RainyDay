@@ -19,6 +19,7 @@ typedef struct {
 } SensorActuatorStatus;
 
 SensorActuatorStatus status = {0, 0, 0, 0, 0, 0};
+int led_value = 0;
 
 void *communication_thread(void *arg) {
     (void)arg; // 사용되지 않는 매개변수를 무시합니다.
@@ -29,7 +30,6 @@ void *communication_thread(void *arg) {
     while (1) {
         int new_socket = accept_client_connection(server_fd);
         if (new_socket < 0) continue;
-
         char buffer[1024] = {0};
         char response[1024] = {0};
         int read_bytes = read(new_socket, buffer, 1024);
@@ -77,14 +77,24 @@ void *communication_thread(void *arg) {
                     } else {
                         if (strcmp(actuator_type->valuestring, "water_pump") == 0) {
                             action = (status.humidity < plants[plant_index].min_humidity);
+                            sprintf(response, "{\"action\":%d}", action);
                         } else if (strcmp(actuator_type->valuestring, "led") == 0) {
-                            action = (status.light_intensity < plants[plant_index].min_light_intensity);
+                            if(status.light_intensity < plants[plant_index].min_light_intensity) {
+	                       if(led_value != 100) {
+                                 led_value += 20;	
+                               }
+                            }
+                            else{
+                              led_value = 0;
+                            }
+
+                            sprintf(response, "{\"led_value\":%d}", led_value);
                         } else if (strcmp(actuator_type->valuestring, "speaker") == 0) {
                             action = (status.water_level < plants[plant_index].min_water_level);
+                            sprintf(response, "{\"action\":%d}", action);
                         }
                     }
 
-                    sprintf(response, "{\"action\":%d}", action);
                 }
             }
         }
