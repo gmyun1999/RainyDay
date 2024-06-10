@@ -17,7 +17,7 @@ Main Device에 작동 여부를 요청하고, 응답 값을 바탕으로 워터�
 
 ``` sh
 
-    ./waterpump
+    ./waterpump <IP주소> <Port번호>
 
 ```
 
@@ -37,6 +37,6 @@ gcc -o waterlevel watelevel.c -ljson-c
 
 ``` sh
 
-./waterlevel
+./waterlevel <IP주소> <Port번호>
 
 ```
